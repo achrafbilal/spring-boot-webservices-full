@@ -41,7 +41,8 @@ public class KafkaBillingService {
         bill.setCustomerID(billEvent.getCustomerID());
         List<ProductItem> productItems=billEvent.getProductItems().stream().map(bE-> new ProductItem()).collect(Collectors.toUnmodifiableList());
         bill.setProductItems(productItems);
-        Bill newBill=billRepository.save(bill);
+        Bill newBill=bill;
+        //newBill=billRepository.save(bill);
         FileWriter fos=new FileWriter("storage/bills.txt",true);
         fos.append(newBill.toString()).append("\n");
         fos.close();

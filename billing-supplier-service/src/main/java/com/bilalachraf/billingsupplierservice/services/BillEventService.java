@@ -63,7 +63,7 @@ public class BillEventService {
 				getRandom(1000)+1L,
 				new Date(new Date().toInstant().minus(getRandom(365), ChronoUnit.DAYS).toEpochMilli()),
 				productItems,
-				getRandom(10)+1L,
+				getRandom(3)+1L,
 				new Date()
 		);
 	}

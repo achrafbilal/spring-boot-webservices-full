@@ -1,4 +1,5 @@
-import { ShowBillComponent } from "./../../../../../GitHub/tp-controle-spring-boot/front/src/app/show-bill/show-bill.component";
+import { AnalyticsComponent } from "./analytics/analytics.component";
+import { ShowBillComponent } from "./show-bill/show-bill.component";
 import { NewBillComponent } from "./new-bill/new-bill.component";
 import { NewCustomerComponent } from "./new-customer/new-customer.component";
 import { EditBillComponent } from "./edit-bill/edit-bill.component";
@@ -16,6 +17,10 @@ const routes: Routes = [
   {
     path: "products",
     component: ProductsComponent,
+  },
+  {
+    path: "analytics",
+    component: AnalyticsComponent,
   },
   {
     path: "user",

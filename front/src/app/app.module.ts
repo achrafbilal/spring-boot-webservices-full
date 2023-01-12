@@ -17,6 +17,7 @@ import { NewBillComponent } from "./new-bill/new-bill.component";
 import { NavbarComponent } from "./navbar/navbar.component";
 import { HttpClientModule } from "@angular/common/http";
 import { ShowBillComponent } from "./show-bill/show-bill.component";
+import { AnalyticsComponent } from './analytics/analytics.component';
 export function kcFactory(kcService: KeycloakService) {
   return () => {
     kcService.init({
@@ -47,6 +48,7 @@ export function kcFactory(kcService: KeycloakService) {
     NewBillComponent,
     NavbarComponent,
     ShowBillComponent,
+    AnalyticsComponent,
   ],
   imports: [
     BrowserModule,

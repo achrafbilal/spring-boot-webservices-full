@@ -1,13 +1,28 @@
 version: '3'
 networks:
-  my-proxy-net:
-    external:
-      name: j2e-project-network
-      driver : bridge
+  j2e-project-network:
+    driver: bridge
+
+#  j2e-project-network:
+#    driver : bridge
+#    external:
+#      name: j2e-project-network
+#      external:true
 services:
+
+#  kafka-zookeper:
+#    image: confluentinc/cp-zookeeper
+#    ports:
+#      - "8089:8089"
+#  kafka-broker:
+#    image:  confluentinc/cp-kafka
+#    depends_on:
+#      - kafka-zookeper
   discovery-service:
+#    depends_on:
+#      - kafka-broker
     networks:
-      - my-proxy-net
+      - j2e-project-network
     image: "discovery-service"
     ports:
       - "8761:8761"
@@ -16,7 +31,7 @@ services:
       dockerfile: "DockerFile"
   config-service:
     networks:
-      - my-proxy-net
+      - j2e-project-network
     depends_on:
       - discovery-service
     image: "config-service"
@@ -27,7 +42,7 @@ services:
       dockerfile: "DockerFile"
   gateway-service:
     networks:
-      - my-proxy-net
+      - j2e-project-network
     depends_on:
       - config-service
       - discovery-service
@@ -39,7 +54,7 @@ services:
       dockerfile: "DockerFile"
   customer-service:
     networks:
-      - my-proxy-net
+      - j2e-project-network
     depends_on:
       - gateway-service
       - discovery-service
@@ -51,7 +66,7 @@ services:
       dockerfile: "DockerFile"
   inventory-service:
     networks:
-      - my-proxy-net
+      - j2e-project-network
     depends_on:
       - gateway-service
       - discovery-service
@@ -63,7 +78,7 @@ services:
       dockerfile: "DockerFile"
   billing-supplier-service:
     networks:
-      - my-proxy-net
+      - j2e-project-network
     image: "billing-supplier-service"
     ports:
       - "8086:8086"
@@ -72,7 +87,7 @@ services:
       dockerfile: "DockerFile"
   billing-service:
     networks:
-      - my-proxy-net
+      - j2e-project-network
     depends_on:
       - gateway-service
       - discovery-service
@@ -87,7 +102,7 @@ services:
       dockerfile: "DockerFile"
   data-analytics-service:
     networks:
-      - my-proxy-net
+      - j2e-project-network
     depends_on:
       - gateway-service
       - discovery-service
@@ -120,5 +135,4 @@ services:
 #      dockerfile: "DockerFile"
 #    depends_on:
 #      - mysql-standalone
-
 

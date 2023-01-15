@@ -19,6 +19,8 @@ const routes: Routes = [
     component: ProductsComponent,
   },
   {
+    canActivate: [AuthGuard],
+    data: { roles: ["USER"] },
     path: "analytics",
     component: AnalyticsComponent,
   },

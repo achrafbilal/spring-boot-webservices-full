@@ -32,6 +32,6 @@ public class SecurityConfig  extends KeycloakWebSecurityConfigurerAdapter {
             .cors().disable()
             .formLogin().disable()
             .authorizeRequests()
-            .anyRequest().authenticated();
+            .anyRequest().permitAll();
     }
 }

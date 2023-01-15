@@ -43,9 +43,9 @@ public class KafkaBillingService {
         bill.setProductItems(productItems);
         Bill newBill=bill;
         //newBill=billRepository.save(bill);
-        FileWriter fos=new FileWriter("storage/bills.txt",true);
-        fos.append(newBill.toString()).append("\n");
-        fos.close();
+        //FileWriter fos=new FileWriter("storage/bills.txt",true);
+        //fos.append(newBill.toString()).append("\n");
+        //fos.close();
 
     }
 }

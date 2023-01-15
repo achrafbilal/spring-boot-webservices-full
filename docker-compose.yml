@@ -1,0 +1,124 @@
+version: '3'
+networks:
+  my-proxy-net:
+    external:
+      name: j2e-project-network
+      driver : bridge
+services:
+  discovery-service:
+    networks:
+      - my-proxy-net
+    image: "discovery-service"
+    ports:
+      - "8761:8761"
+    build:
+      context: "./discovery-service/"
+      dockerfile: "DockerFile"
+  config-service:
+    networks:
+      - my-proxy-net
+    depends_on:
+      - discovery-service
+    image: "config-service"
+    ports:
+      - "8088:8088"
+    build:
+      context: "./config-server-demo/"
+      dockerfile: "DockerFile"
+  gateway-service:
+    networks:
+      - my-proxy-net
+    depends_on:
+      - config-service
+      - discovery-service
+    image: "gateway-service"
+    ports:
+      - "8888:8888"
+    build:
+      context: "./gateway-service/"
+      dockerfile: "DockerFile"
+  customer-service:
+    networks:
+      - my-proxy-net
+    depends_on:
+      - gateway-service
+      - discovery-service
+    image: "customer-service"
+    ports:
+      - "8081:8081"
+    build:
+      context: "./customer-service/"
+      dockerfile: "DockerFile"
+  inventory-service:
+    networks:
+      - my-proxy-net
+    depends_on:
+      - gateway-service
+      - discovery-service
+    image: "inventory-service"
+    ports:
+      - "8082:8082"
+    build:
+      context: "./inventory-service/"
+      dockerfile: "DockerFile"
+  billing-supplier-service:
+    networks:
+      - my-proxy-net
+    image: "billing-supplier-service"
+    ports:
+      - "8086:8086"
+    build:
+      context: "./billing-supplier-service/"
+      dockerfile: "DockerFile"
+  billing-service:
+    networks:
+      - my-proxy-net
+    depends_on:
+      - gateway-service
+      - discovery-service
+      - inventory-service
+      - customer-service
+      - billing-supplier-service
+    image: "billing-service"
+    ports:
+      - "8083:8083"
+    build:
+      context: "./billing-service/"
+      dockerfile: "DockerFile"
+  data-analytics-service:
+    networks:
+      - my-proxy-net
+    depends_on:
+      - gateway-service
+      - discovery-service
+      - billing-supplier-service
+    image: "data-analytics-service"
+    ports:
+      - "8084:8084"
+    build:
+      context: "./data-analytics-service/"
+      dockerfile: "DockerFile"
+
+#  mysql-standalone:
+#    image: 'mysql:5.7'
+#    environment:
+#      - MYSQL_ROOT_PASSWORD=root
+#      - MYSQL_PASSWORD=root
+#      - MYSQL_DATABASE=demo
+#    ports:
+#      - "3307:3306"
+#  springboot-docker-container:
+#    image: springboot-docker-container
+#    ports:
+#      - "8082:8082"
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-standalone:3306/demo?autoReconnect=true&useSSL=false
+#      SPRING_DATASOURCE_USERNAME: "root"
+#      SPRING_DATASOURCE_PASSWORD: "root"
+#    build:
+#      context: "./"
+#      dockerfile: "DockerFile"
+#    depends_on:
+#      - mysql-standalone
+
+

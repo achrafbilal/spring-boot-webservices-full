@@ -16,31 +16,47 @@ export class AnalyticsComponent implements OnInit {
     public authService: SecurityService,
     private analyticsService: AnalyticsService
   ) {}
-  series!: TimeSeries;
+  series: TimeSeries[] = [new TimeSeries(), new TimeSeries(), new TimeSeries()];
   canvas: HTMLCanvasElement = document.getElementById(
     "chart"
   ) as HTMLCanvasElement;
   chart = new SmoothieChart();
+  randomColor(): string {
+    const hex = "ABCDEF0123456789";
+    let color = "#";
+    for (let i = 0; i < 8; i++)
+      color += hex.charAt(Math.round(Math.random() * hex.length - 1));
+    return color;
+  }
+  colors = ["rgba(0,255,0,1)", "rgba(255,0,0,0.8)", "rgba(0,0,255,0.6)"];
   ngOnInit(): void {
-    this.series = new TimeSeries();
-    //this.canvas;
-    this.chart.addTimeSeries(this.series, {
-      strokeStyle: "rgba(0, 255, 0, 1)",
-    });
+    for (let i = 0; i < 3; i++) {
+      //this.series.push(new TimeSeries());
+      let color = this.colors[i];
+      this.chart.addTimeSeries(this.series[i], {
+        strokeStyle: color,
+      });
+      //"rgba(0, 255, 0, 1)"
+    }
+
     this.canvas = document.getElementById("chart") as HTMLCanvasElement;
     this.chart.streamTo(this.canvas, 500);
-
-    const context = this;
-    setInterval(function () {
-      context.series.append(Date.now(), Math.random() * 10000);
-      console.log("e");
-    }, 500);
     this.getAnalytics();
   }
 
   getAnalytics(): void {
-    this.analyticsService.getAnalytics().subscribe((data) => {
-      console.log(data);
-    });
+    const context = this;
+    this.analyticsService
+      .getAnalytics()
+      .addEventListener("message", (response) => {
+        const data = JSON.parse(response.data);
+        for (let index = 0; index < 3; index++) {
+          context.series[index].append(Date.now(), data[index + 1]);
+        }
+      });
+    // this.analyticsService.getAnalytics().subscribe((data) => {
+    //   console.log("Analytics");
+    //   console.log(data);
+    // });
   }
 }

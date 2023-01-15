@@ -38,7 +38,7 @@ public class KafkaAnalyticsService {
         //.filter((k,v)-> Instant.now().minus(1,ChronoUnit.YEARS).isBefore(v.getBillingDate().toInstant()))//v.getBillingDate().toInstant().minus(1, ChronoUnit.YEARS)>)
         .map((k,v)->new KeyValue<Long,Long>(v.getCustomerID(),0L))
         .groupBy((k,v)->k, Grouped.with(Serdes.Long(),Serdes.Long()))
-        .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofSeconds(60*60)))
+        .windowedBy(TimeWindows.ofSizeWithNoGrace(Duration.ofSeconds(60)))
         .count(Materialized.as("bill-count"))
         .toStream()
         .map(

@@ -28,10 +28,11 @@ public class SecurityConfig  extends KeycloakWebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
         http
-                .csrf().disable()
-                .cors().disable()
-                .formLogin().disable()
-                .authorizeRequests()
-                .anyRequest().authenticated();
+            .csrf().disable()
+            .cors().disable()
+            .formLogin().disable()
+            .authorizeRequests()
+            .antMatchers("/api/**").permitAll()
+            .anyRequest().authenticated();
     }
 }

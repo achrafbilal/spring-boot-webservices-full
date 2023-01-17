@@ -13,7 +13,4 @@ public class ProductItemEvent {
     private Integer quantity;
     private Long productID;
     private Double price;
-    public Double getTotal(){
-        return this.price*this.quantity;
-    }
 }

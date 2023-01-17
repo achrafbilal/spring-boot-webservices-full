@@ -3,30 +3,30 @@ package com.bilalachraf.billingsupplierservice.services;
 import com.bilalachraf.billingsupplierservice.entities.Bill;
 import com.bilalachraf.billingsupplierservice.entities.ProductItem;
 import com.bilalachraf.billingsupplierservice.events.BillEvent;
-import com.bilalachraf.billingsupplierservice.events.ProductItemEvent;
-import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.KeyValue;
-import org.apache.kafka.streams.kstream.Grouped;
-import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.Materialized;
-import org.apache.kafka.streams.kstream.TimeWindows;
+import com.bilalachraf.billingsupplierservice.feign.CustomerRestClient;
+import com.bilalachraf.billingsupplierservice.feign.ProductRestClient;
+import com.bilalachraf.billingsupplierservice.model.Customer;
+import com.bilalachraf.billingsupplierservice.model.Product;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 @Service
 public class BillEventService {
 
+	@Autowired
+	CustomerRestClient customerRestClient;
+	@Autowired
+	ProductRestClient productRestClient;
+	private static Long billCount =1L;
+	private static Long productItemCount =1L;
 
 
 //	@Bean
@@ -48,24 +48,32 @@ public class BillEventService {
 		return this::generateBill;
 	}
 	private BillEvent generateBill(){
-
-		List<ProductItemEvent> productItems=new ArrayList<>();
-		for (int i = 0; i < getRandom(4)+1; i++) {
-			productItems.add(
-					new ProductItemEvent(
-							getRandom(1000),
-							(long) getRandom(10),
-							(double) ((getRandom(20) * 1000) + 1)
-					)
-			);
+		Customer customer=customerRestClient.getRandomCustomer();
+		List<Product> products=productRestClient.getRandomPageProducts();
+		if(products.size()==0)
+			throw new RuntimeException("Product items length is 0");
+		List<ProductItem> productItems=new ArrayList<>();
+		Bill bill=new Bill();
+		bill.setId(billCount++);
+		bill.setBillingDate(new Date(new Date().toInstant().minus(getRandom(365), ChronoUnit.DAYS).toEpochMilli()));
+		bill.setCustomerID(customer.getId());
+		Random random=new Random();
+		for (int i = 0; i < products.size(); i++){
+			ProductItem productItem=new ProductItem();
+			productItem.setId(productItemCount++);
+			productItem.setProductID(products.get(i).getId());
+			productItem.setPrice((double) Math.round(random.nextDouble()*random.nextInt(1000)));
+			productItem.setQuantity(random.nextInt(500));
+			productItems.add(productItem);
 		}
-		return new BillEvent(
+		bill.setProductItems(productItems);
+		BillEvent billEvent=new BillEvent(
 				getRandom(1000)+1L,
-				new Date(new Date().toInstant().minus(getRandom(365), ChronoUnit.DAYS).toEpochMilli()),
-				productItems,
-				getRandom(3)+1L,
+				bill,
 				new Date()
 		);
+		System.out.println(billCount);
+		return billEvent;
 	}
 
 //	@Bean

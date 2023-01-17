@@ -12,8 +12,6 @@ import java.util.Date;
 @Data @AllArgsConstructor @NoArgsConstructor
 public class BillEvent {
     private Long id;
-    private Date billingDate;
-    private Collection<ProductItemEvent> productItems;
-    private Long customerID;
+    private Bill bill;
     private Date createdAt;
 }

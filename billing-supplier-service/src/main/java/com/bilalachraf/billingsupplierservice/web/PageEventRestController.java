@@ -42,7 +42,7 @@ public class PageEventRestController {
 					Map<String,Long> stringLongMap=new HashMap<>();
 					ReadOnlyWindowStore<String,Long> windowStore=interactiveQueryService.getQueryableStore("page-count", QueryableStoreTypes.windowStore());
 					Instant now=Instant.now();
-					Instant from=now.minusMillis(5000);
+					Instant from=now.minusMillis(2000);//TODO 5000
 					KeyValueIterator<Windowed<String>,Long> fetchAll=windowStore.fetchAll(from,now);
 					while ((fetchAll.hasNext())){
 						KeyValue<Windowed<String>,Long> next=fetchAll.next();

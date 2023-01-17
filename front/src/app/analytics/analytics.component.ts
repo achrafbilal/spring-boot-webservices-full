@@ -16,6 +16,8 @@ export class AnalyticsComponent implements OnInit {
     public authService: SecurityService,
     private analyticsService: AnalyticsService
   ) {}
+
+  viewMode: String = "top";
   series: TimeSeries[] = [new TimeSeries(), new TimeSeries(), new TimeSeries()];
   canvas: HTMLCanvasElement = document.getElementById(
     "chart"
@@ -24,24 +26,32 @@ export class AnalyticsComponent implements OnInit {
   randomColor(): string {
     const hex = "ABCDEF0123456789";
     let color = "#";
-    for (let i = 0; i < 8; i++)
+    for (let i = 0; i < 6; i++)
       color += hex.charAt(Math.round(Math.random() * hex.length - 1));
     return color;
   }
-  colors = ["rgba(0,255,0,1)", "rgba(255,0,0,0.8)", "rgba(0,0,255,0.6)"];
-  ngOnInit(): void {
-    for (let i = 0; i < 3; i++) {
-      //this.series.push(new TimeSeries());
-      let color = this.colors[i];
-      this.chart.addTimeSeries(this.series[i], {
-        strokeStyle: color,
-      });
-      //"rgba(0, 255, 0, 1)"
-    }
+  colors = [
+    "rgba(0,255,0,1)",
+    "rgba(255,0,0,1)",
+    "rgba(0,0,255,1)",
+    "rgba(140,140,140,1)",
+  ];
 
+  colorsAlpha = [
+    "rgba(0,255,0,5)",
+    "rgba(255,0,0,0.5)",
+    "rgba(0,0,255,0.5)",
+    "rgba(0,140,140,0.5)",
+  ];
+  ngOnInit(): void {
     this.canvas = document.getElementById("chart") as HTMLCanvasElement;
     this.chart.streamTo(this.canvas, 500);
     this.getAnalytics();
+  }
+  onViewModeSelectChange(mode: string): void {
+    console.log(mode);
+    this.series = [];
+    this.viewMode = mode;
   }
 
   getAnalytics(): void {
@@ -50,9 +60,28 @@ export class AnalyticsComponent implements OnInit {
       .getAnalytics()
       .addEventListener("message", (response) => {
         const data = JSON.parse(response.data);
-        for (let index = 0; index < 3; index++) {
-          context.series[index].append(Date.now(), data[index + 1]);
-        }
+        const keys = Object.keys(data);
+        let arr = keys.sort((a, b) =>
+          this.viewMode === "last"
+            ? Number(a) - Number(b)
+            : Number(b) - Number(a)
+        );
+        if (keys.length > 4) arr = keys.slice(0, 4);
+        arr.forEach((key, index) => {
+          if (keys.length !== context.series.length) {
+            this.series.push(new TimeSeries());
+            this.chart.addTimeSeries(this.series[index], {
+              strokeStyle: this.colors[index],
+              fillStyle: this.colorsAlpha[index],
+              lineWidth: 3,
+            });
+          }
+          console.log(key, index);
+          context.series[index].append(Date.now(), data[key]);
+        });
+        // for (let index = 0; index < Object.keys(data).length; index++) {
+        //   context.series[index].append(Date.now(), data[index + 1]);
+        // }
       });
     // this.analyticsService.getAnalytics().subscribe((data) => {
     //   console.log("Analytics");

@@ -7,11 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import scala.Product;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@ToString
+@Data @AllArgsConstructor @NoArgsConstructor @ToString
 public class ProductItem {
+    private Long id;
     private Integer quantity;
     private Long productID;
     private Double price;

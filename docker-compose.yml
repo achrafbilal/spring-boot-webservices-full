@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 networks:
   j2e-project-network:
     driver: bridge
@@ -9,18 +9,19 @@ networks:
 #      name: j2e-project-network
 #      external:true
 services:
+  #  kafka-zookeper:
+  #    image: confluentinc/cp-zookeeper
+  #    ports:
+  #      - "8089:8089"
+  #  kafka-broker:
+  #    image:  confluentinc/cp-kafka
+  #    depends_on:
+  #      - kafka-zookeper
 
-#  kafka-zookeper:
-#    image: confluentinc/cp-zookeeper
-#    ports:
-#      - "8089:8089"
-#  kafka-broker:
-#    image:  confluentinc/cp-kafka
-#    depends_on:
-#      - kafka-zookeper
   discovery-service:
-#    depends_on:
-#      - kafka-broker
+    container_name: discovery-service
+    #    depends_on:
+    #      - kafka-broker
     networks:
       - j2e-project-network
     image: "discovery-service"
@@ -29,7 +30,9 @@ services:
     build:
       context: "./discovery-service/"
       dockerfile: "DockerFile"
+
   config-service:
+    container_name: config-service
     networks:
       - j2e-project-network
     depends_on:
@@ -40,7 +43,12 @@ services:
     build:
       context: "./config-server-demo/"
       dockerfile: "DockerFile"
+    environment:
+      - EUREKA_SERVER=discovery-service
+      - EUREKA_PORT=8761
+
   gateway-service:
+    container_name: gateway-service
     networks:
       - j2e-project-network
     depends_on:
@@ -52,7 +60,14 @@ services:
     build:
       context: "./gateway-service/"
       dockerfile: "DockerFile"
+    environment:
+      - CONFIG_SERVER = config-service
+      - CONFIG_PORT = 8088
+      - EUREKA_SERVER = discovery-service
+      - EUREKA_PORT = 8761
+
   customer-service:
+    container_name: customer-service
     networks:
       - j2e-project-network
     depends_on:
@@ -64,7 +79,14 @@ services:
     build:
       context: "./customer-service/"
       dockerfile: "DockerFile"
+    environment:
+      - CONFIG_SERVER=config-service
+      - CONFIG_PORT=8088
+      - EUREKA_SERVER=discovery-service
+      - EUREKA_PORT=8761
+
   inventory-service:
+    container_name: inventory-service
     networks:
       - j2e-project-network
     depends_on:
@@ -76,7 +98,14 @@ services:
     build:
       context: "./inventory-service/"
       dockerfile: "DockerFile"
+    environment:
+      - CONFIG_SERVER=config-service
+      - CONFIG_PORT=8088
+      - EUREKA_SERVER=discovery-service
+      - EUREKA_PORT=8761
+
   billing-supplier-service:
+    container_name: billing-supplier-service
     networks:
       - j2e-project-network
     image: "billing-supplier-service"
@@ -85,7 +114,14 @@ services:
     build:
       context: "./billing-supplier-service/"
       dockerfile: "DockerFile"
+    environment:
+      - CONFIG_SERVER=config-service
+      - CONFIG_PORT=8088
+      - EUREKA_SERVER=discovery-service
+      - EUREKA_PORT=8761
+
   billing-service:
+    container_name: billing-service
     networks:
       - j2e-project-network
     depends_on:
@@ -100,7 +136,14 @@ services:
     build:
       context: "./billing-service/"
       dockerfile: "DockerFile"
+    environment:
+      - CONFIG_SERVER=config-service
+      - CONFIG_PORT=8088
+      - EUREKA_SERVER=discovery-service
+      - EUREKA_PORT=8761
+
   data-analytics-service:
+    container_name: data-analytics-service
     networks:
       - j2e-project-network
     depends_on:
@@ -113,7 +156,11 @@ services:
     build:
       context: "./data-analytics-service/"
       dockerfile: "DockerFile"
-
+    environment:
+      - CONFIG_SERVER=config-service
+      - CONFIG_PORT=8088
+      - EUREKA_SERVER=discovery-service
+      - EUREKA_PORT=8761
 #  mysql-standalone:
 #    image: 'mysql:5.7'
 #    environment:
